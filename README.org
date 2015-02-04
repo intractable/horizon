@@ -1,0 +1,4 @@
+* Welcome!
+
+  This package contains a Haskell module for computing sunrise and sunset times
+  from latitude and longitude coordinates.
