@@ -6,3 +6,6 @@
   Note that approximations are provided in UTC time only, no additional support
   for time zones is implemented.
 
+  This module has only been lightly tested, and produces values close to those
+  found at http://aa.usno.navy.mil/data/docs/RS_OneYear.php.
+
