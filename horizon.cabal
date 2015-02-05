@@ -1,7 +1,7 @@
 name:                horizon
 version:             0.1.0
 synopsis:            Sunrise and sunset UTC approximations from latitude and longitude coordinates
-description:         Provides a basic implementation of the sunrise/sunset equation from https://en.wikipedia.org/wiki/Sunrise_equation.
+description:         Provides a basic implementation of the sunrise and sunset equations from https:\/\/en.wikipedia.org\/wiki\/Sunrise_equation.
 license:             BSD3
 license-file:        LICENSE
 author:              Joel Stanley
