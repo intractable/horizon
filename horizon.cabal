@@ -1,6 +1,7 @@
 name:                horizon
 version:             0.1.0
 synopsis:            Sunrise and sunset UTC approximations from latitude and longitude coordinates
+description:         Provides a basic implementation of the sunrise/sunset equation from https://en.wikipedia.org/wiki/Sunrise_equation.
 license:             BSD3
 license-file:        LICENSE
 author:              Joel Stanley
@@ -9,6 +10,10 @@ category:            Data
 build-type:          Simple
 extra-source-files:  README.org
 cabal-version:       >=1.10
+stability:           provisional
+homepage:            https://github.com/intractable/horizon
+bug-reports:         https://github.com/intractable/horizon/issues
+tested-with:         GHC == 7.8.3                        
 
 library
   exposed-modules:     Data.Time.Horizon
@@ -19,3 +24,7 @@ library
                        AC-Angle >= 1.0 && < 2.0
   hs-source-dirs:      src
   default-language:    Haskell2010
+
+source-repository head
+    type:       git
+    location:   https://github.com/intractable/horizon.git
