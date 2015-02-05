@@ -1,4 +1,8 @@
 * Welcome!
 
-  This package contains a Haskell module for computing sunrise and sunset times
-  from latitude and longitude coordinates.
+  This package contains a Haskell module for computing approximate sunrise and
+  sunset UTC times from latitude and longitude.
+
+  Note that approximations are provided in UTC time only, no additional support
+  for time zones is implemented.
+
