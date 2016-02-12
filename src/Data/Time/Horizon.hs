@@ -23,6 +23,8 @@ module Data.Time.Horizon
   , sunset
   , dusk
   , dawn
+  , sunrise'
+  , sunset'
   )
   where
 
@@ -35,50 +37,49 @@ type LongitudeWest = Double
 
 -- | Returns an approximated UTC time of the sunrise on the given UTC day at the given location.
 sunrise :: Day -> LongitudeWest -> LatitudeNorth -> Maybe UTCTime
-sunrise d lw ln = fmap (mkUTC d . jdToSeconds) dt
-  where dt = sunrise' d lw ln (Degrees 0.0)
+sunrise d lw ln = sunrise' d (Degrees (-0.83)) lw ln
 
 -- | Returns an approximated UTC time of the sunset on the given UTC day at the given location.
 sunset :: Day -> LongitudeWest -> LatitudeNorth -> Maybe UTCTime
-sunset d lw ln = fmap (mkUTC d .  jdToSeconds) dt
-  where dt = sunset' d lw ln (Degrees 0.0)
-
-
-{-
- - In the dusk and dawn functions, there's an arbitary addition of 0.65, which
- - is there to better fit the results to the data found on
- - http://aa.usno.navy.mil/data/docs/RS_OneYear.php
- -}
+sunset d lw ln = sunset' d (Degrees (-0.83)) lw ln
 
 -- | Returns an approx UTC time for astronomical sunset (when the sun falls
 -- below 18 degrees below the horison)
 dusk :: Day -> LongitudeWest -> LatitudeNorth -> Maybe UTCTime
-dusk d lw ln = fmap (mkUTC d . jdToSeconds) dt
-  where dt = sunset' d lw ln (Degrees (-18.0 + 0.65))
+dusk d lw ln = sunset' d (Degrees (-18.0)) lw ln
 
 -- | Returns an approx UTC time for astromical sunrise time (when the sun rises
 -- above 18 degrees below the horison)
 dawn :: Day -> LongitudeWest -> LatitudeNorth -> Maybe UTCTime
-dawn d lw ln = fmap (mkUTC d . jdToSeconds) dt
-  where dt = sunrise' d lw ln (Degrees (-18.0 + 0.65))
+dawn d lw ln = sunrise' d (Degrees (-18.0)) lw ln
+
+-- | Returns an approximated UTC time of the given sunset on the given UTC day at the given location.
+sunset' :: Day -> Degrees Double -> LongitudeWest -> LatitudeNorth -> Maybe UTCTime
+sunset' d deg lw ln = fmap (mkUTC d .  jdToSeconds) dt
+  where dt = jsunset d deg lw ln
+
+-- | Returns an approximated UTC time of the sunrise on the given UTC day at the given location.
+sunrise' :: Day -> Degrees Double -> LongitudeWest -> LatitudeNorth -> Maybe UTCTime
+sunrise' d deg lw ln = fmap (mkUTC d . jdToSeconds) dt
+  where dt = jsunrise d deg lw ln
 
 -- | Approximate the Julian date of the sunrise on the given UTC day at the given location.
-sunrise' :: Day -> LongitudeWest -> LatitudeNorth -> Degrees Double -> Maybe Double
-sunrise' d lw ln deg = fmap (\x -> jtransit - (x - jtransit)) jset
+jsunrise :: Day -> Degrees Double -> LongitudeWest -> LatitudeNorth -> Maybe Double
+jsunrise d deg lw ln = fmap (\x -> jtransit - (x - jtransit)) jset
   where
     u        = mkUTC d 0
     jtransit = solarTransit u lw
-    jset     = sunset' d lw ln deg
+    jset     = jsunset d deg lw ln
 
 -- | Approximate the Julian date of the sunset on the given UTC day at the given location.
-sunset' :: Day -> LongitudeWest -> LatitudeNorth -> Degrees Double -> Maybe Double
-sunset' d lw ln deg =
+jsunset :: Day -> Degrees Double -> LongitudeWest -> LatitudeNorth -> Maybe Double
+jsunset d deg lw ln =
   if isNaN w0
     then Nothing
     else Just $ 2451545.0009 + ((w0 + lw) / 360) + n + 0.0053 * sine m - 0.0069 * sine (2 * lambda)
   where
     u          = mkUTC d 0
-    Degrees w0 = omega0 u lw ln deg
+    Degrees w0 = omega0 u deg lw ln
     n          = fromIntegral (julianCycle u lw :: Integer)
     m          = solarMeanAnomaly u lw
     lambda     = eclipticLongitude u lw
@@ -138,10 +139,10 @@ declination u lw = arcsine (sine lambda * sine (Degrees 23.45))
   where
     lambda = eclipticLongitude u lw
 
-omega0 :: UTCTime -> LongitudeWest -> LatitudeNorth -> Degrees Double -> Degrees Double
-omega0 u lw ln deg = arccosine (num / denom)
+omega0 :: UTCTime -> Degrees Double -> LongitudeWest -> LatitudeNorth -> Degrees Double
+omega0 u deg lw ln = arccosine (num / denom)
   where
-    num    = sine ((Degrees (-0.83)) + deg) - sine phi * sine gamma'
+    num    = sine deg - sine phi * sine gamma'
     denom  = cosine phi * cosine gamma'
     phi    = Degrees ln
     gamma' = declination u lw
