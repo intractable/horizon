@@ -14,13 +14,13 @@ stability:           provisional
 homepage:            https://github.com/intractable/horizon
 bug-reports:         https://github.com/intractable/horizon/issues
 Package-url:         http://hackage.haskell.org/package/horizon
-tested-with:         GHC == 7.8.3                        
+tested-with:         GHC == 7.8.3, GHC == 8.2.2
 
 library
   exposed-modules:     Data.Time.Horizon
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.7 && <= 4.8,
+  build-depends:       base >=4.7      && < 5.0,
                        time,
                        AC-Angle >= 1.0 && < 2.0
   hs-source-dirs:      src
