@@ -20,6 +20,7 @@ module Data.Time.Horizon
   , LongitudeWest
   , sunrise
   , sunset
+  , solarNoon
   )
   where
 
@@ -56,6 +57,13 @@ sunset' d lw ln =
     n          = fromIntegral (julianCycle u lw :: Integer)
     m          = solarMeanAnomaly u lw
     lambda     = eclipticLongitude u lw
+
+-- | Returns an approximated UTC time of solar noon on the given UTC day
+-- at the given longitude.
+solarNoon :: Day -> LongitudeWest -> UTCTime
+solarNoon d lw = mkUTC d . jdToSeconds $ solarTransit u lw
+  where
+    u          = mkUTC d 0
 
 toJD :: RealFrac a => UTCTime -> a
 toJD = (+2400000.5) . toMJD
